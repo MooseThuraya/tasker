@@ -1,5 +1,7 @@
 # Tasker - A Modern Task Management Application
 
+![diagram-export-4-24-2025-8_56_51-PM](https://github.com/user-attachments/assets/d0ebad64-71e4-4bf4-a591-04aef5aa96fc)
+
 A production-ready Flask application for task management with comprehensive metrics dashboard.
 
 ## Features
