@@ -37,6 +37,16 @@ python startup.py
 
 The application will be available at `http://localhost:5003`
 
+### Database Reset
+
+If you want to reset the database and start fresh with sample data:
+
+```bash
+python startup.py --reset-db
+```
+
+This will remove all existing data and re-create the database with sample tasks.
+
 ### Alternative Startup Methods
 
 On Linux/macOS:

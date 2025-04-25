@@ -26,15 +26,18 @@ source venv/bin/activate
 echo "[SETUP] Installing dependencies..."
 pip install -r requirements.txt
 
-# Reset database and seed it with fresh data
-echo "[SETUP] Resetting and seeding the database..."
-python3 reset_db.py
+# Check if database reset is requested
+RESET_FLAG=""
+if [ "$1" == "--reset-db" ]; then
+    RESET_FLAG="--reset-db"
+    echo "[INFO] Database reset requested. All data will be erased."
+fi
 
 # Run the application
 echo ""
 echo "[START] Starting application..."
-echo "[INFO] The application will be available at: http://localhost:5001"
-echo "[INFO] You can view debug information at: http://localhost:5001/app-debug"
+echo "[INFO] The application will be available at: http://localhost:5003"
+echo "[INFO] You can view debug information at: http://localhost:5003/app-debug"
 echo "[INFO] Press Ctrl+C to stop the server when you're done"
 echo ""
-python3 app.py
+python3 startup.py $RESET_FLAG

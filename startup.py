@@ -26,14 +26,18 @@ def main():
     
     # Import the necessary modules
     try:
-        # Reset and seed the database
-        print("Step 1: Resetting and seeding the database...")
-        import reset_db
-        reset_db.reset_database()
-        
         # Import app
         from app import create_app, db
         from app.models import Task
+        
+        # Check if database reset is requested
+        reset_requested = '--reset-db' in sys.argv
+        if reset_requested:
+            # Reset and seed the database
+            print("Step 1: Resetting and seeding the database...")
+            import reset_db
+            reset_db.reset_database()
+            print("Database reset complete.")
         
         # Create the application instance
         app = create_app({"DEBUG": True})

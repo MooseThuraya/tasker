@@ -26,17 +26,18 @@ REM Install dependencies
 echo [SETUP] Installing dependencies...
 pip install -r requirements.txt
 
-REM Create .env file if it doesn't exist
-if not exist .env (
-    echo [SETUP] Creating .env file...
-    copy .env.example .env
-    echo   Note: You may want to edit .env for custom configuration.
+REM Check if database reset is requested
+set RESET_FLAG=
+if "%1"=="--reset-db" (
+    set RESET_FLAG=--reset-db
+    echo [INFO] Database reset requested. All data will be erased.
 )
 
 REM Run the application
 echo.
 echo [START] Starting application...
-echo [INFO] The application will be available at: http://localhost:5001
+echo [INFO] The application will be available at: http://localhost:5003
+echo [INFO] You can view debug information at: http://localhost:5003/app-debug
 echo [INFO] Press Ctrl+C to stop the server when you're done
 echo.
-python app.py
+python startup.py %RESET_FLAG%
