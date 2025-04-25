@@ -1,0 +1,320 @@
+/* Modern task manager styles inspired by Monday.com and Asana */
+
+:root {
+    --primary-color: #7b68ee;
+    --primary-light: #f3f1ff;
+    --secondary-color: #e2e6f0;
+    --success-color: #5cb85c;
+    --danger-color: #ff5252;
+    --warning-color: #ffcd56;
+    --text-color: #172b4d;
+    --text-muted: #6b778c;
+    --bg-color: #f7f9fd;
+    --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --border-radius: 8px;
+    --transition-speed: 0.2s;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    line-height: 1.6;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: white !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 0;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: var(--primary-color) !important;
+}
+
+.navbar .nav-link {
+    color: var(--text-color) !important;
+    font-weight: 500;
+}
+
+.navbar .nav-link.active {
+    color: var(--primary-color) !important;
+}
+
+/* Card styling */
+.card {
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s ease;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-top-left-radius: 0.75rem !important;
+    border-top-right-radius: 0.75rem !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Task list items */
+.task-item {
+    transition: all 0.2s ease-in-out;
+    padding: 1.25rem 1rem;
+    border-left-width: 4px;
+    border-left-style: solid;
+}
+
+.task-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Priority-based left borders */
+.task-item.task-high-priority {
+    border-left-color: #dc3545;
+}
+
+.task-item.task-medium-priority {
+    border-left-color: #ffc107;
+}
+
+.task-item.task-low-priority {
+    border-left-color: #17a2b8;
+}
+
+.task-item.task-no-priority {
+    border-left-color: #6c757d;
+}
+
+.task-item.task-completed {
+    border-left-color: #28a745;
+    background-color: #f8f9fa;
+}
+
+.task-item.task-overdue {
+    border-left-color: #dc3545;
+}
+
+/* Task title styling */
+.task-title {
+    font-weight: 500;
+    color: #212529;
+}
+
+.task-completed .task-title {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* Badge styling */
+.badge {
+    padding: 0.4em 0.8em;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+    display: inline-block;
+    min-width: 70px;
+    text-align: center;
+}
+
+/* Due date badges */
+.badge.bg-danger {
+    background-color: #ff5252 !important;  /* Brighter red */
+}
+
+.badge.bg-warning {
+    background-color: #ffd43b !important;  /* Better yellow */
+}
+
+.badge.bg-info {
+    background-color: #4dabf7 !important;  /* Better blue */
+}
+
+.badge.bg-success {
+    background-color: #40c057 !important;  /* Better green */
+}
+
+.badge.bg-secondary {
+    background-color: #adb5bd !important;  /* Lighter gray */
+}
+
+/* Form controls */
+.form-control:focus, .form-select:focus {
+    border-color: #7b68ee;
+    box-shadow: 0 0 0 0.2rem rgba(123, 104, 238, 0.25);
+}
+
+.input-group-text {
+    background-color: white;
+}
+
+/* Button styling */
+.btn-outline-primary {
+    color: #6c5ce7;
+    border-color: #6c5ce7;
+}
+
+.btn-outline-primary:hover {
+    background-color: #6c5ce7;
+    border-color: #6c5ce7;
+}
+
+.btn-primary {
+    background-color: #6c5ce7;
+    border-color: #6c5ce7;
+}
+
+.btn-primary:hover {
+    background-color: #5a49c7;
+    border-color: #5a49c7;
+}
+
+/* Empty state */
+.empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+/* Priority indicators */
+.priority-high {
+    color: #dc3545;
+}
+
+.priority-medium {
+    color: #ffc107;
+}
+
+.priority-low {
+    color: #17a2b8;
+}
+
+/* Status badges */
+.status-completed {
+    background-color: #28a745;
+}
+
+.status-pending {
+    background-color: #6c757d;
+}
+
+.status-overdue {
+    background-color: #dc3545;
+}
+
+/* Animation for new tasks */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.new-task {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Tooltip styling */
+.tooltip {
+    font-size: 0.8rem;
+}
+
+/* Task list styling */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+    transition: background-color 0.15s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--primary-light);
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+/* Custom transitions */
+.fade-hover {
+    transition: opacity 0.3s ease;
+}
+
+.fade-hover:hover {
+    opacity: 0.8;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+    transition: transform var(--transition-speed);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c5c5c5;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Additional styling beyond Bootstrap */
+.task-overdue {
+    border-left: 4px solid #dc3545;
+}
+
+.task-completed {
+    opacity: 0.7;
+}
+
+/* Dashboard styles */
+.card-dashboard {
+    transition: transform 0.2s;
+}
+
+.card-dashboard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Improve form elements */
+.form-control:focus {
+    border-color: #6c63ff;
+    box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
+}
+
+/* Custom button styles */
+.btn-task {
+    border-radius: 20px;
+    padding: 0.375rem 1.5rem;
+}
+
+/* Footer styling */
+.app-footer {
+    margin-top: 2rem;
+    padding: 1rem 0;
+    border-top: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: 0.875rem;
+}

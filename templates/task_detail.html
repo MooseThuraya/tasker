@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }} | {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('tasks.index') }}" class="text-decoration-none">
+        <i class="fas fa-arrow-left me-1"></i> Back to Tasks
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0">Task Details</h5>
+        <div class="btn-group">
+            {% if not task.completed %}
+            <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-edit me-1"></i> Edit
+            </a>
+            {% endif %}
+            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="fas fa-trash-alt me-1"></i> Delete
+            </button>
+            
+            {% if not task.archived %}
+            <form method="POST" action="{{ url_for('tasks.archive_task', task_id=task.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-archive me-1"></i> Archive
+                </button>
+            </form>
+            {% else %}
+            <form method="POST" action="{{ url_for('tasks.unarchive_task', task_id=task.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-box-open me-1"></i> Unarchive
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="task-header mb-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="task-icon me-3">
+                    <i class="fas {% if task.completed %}fa-check-circle text-success{% elif task.is_overdue %}fa-exclamation-circle text-danger{% else %}fa-circle-notch text-secondary{% endif %} fa-2x"></i>
+                </div>
+                <div>
+                    <h3 class="card-title mb-1">{{ task.title }}</h3>
+                    <div class="d-flex align-items-center flex-wrap">
+                        <span class="badge {% if task.completed %}bg-success{% elif task.is_overdue %}bg-danger{% else %}bg-secondary{% endif %} me-2">
+                            {% if task.completed %}Completed{% elif task.is_overdue %}Overdue{% else %}Pending{% endif %}
+                        </span>
+                        
+                        {% if task.priority %}
+                        <span class="badge {% if task.priority == 'high' %}bg-danger{% elif task.priority == 'medium' %}bg-warning text-dark{% elif task.priority == 'low' %}bg-info{% else %}bg-secondary{% endif %} me-2">
+                            {{ task.get_priority_label() }} Priority
+                        </span>
+                        {% endif %}
+                        
+                        <span class="text-muted small">Created on {{ task.created_at.strftime('%b %d, %Y') }}</span>
+                        
+                        {% if task.archived %}
+                        <span class="badge bg-secondary ms-2">
+                            <i class="fas fa-archive me-1"></i> Archived
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            {% if task.get_tags_list() %}
+            <div class="tags-container mb-2 d-flex align-items-center flex-wrap">
+                <span class="text-muted me-2"><i class="fas fa-tags me-1"></i> Tags:</span>
+                {% for tag in task.get_tags_list() %}
+                <div class="tag-item d-inline-flex align-items-center bg-light rounded-pill px-3 py-1 me-2 mb-2">
+                    <span class="me-2">{{ tag }}</span>
+                    {% if not task.completed %}
+                    <form method="POST" action="{{ url_for('tasks.remove_tag', task_id=task.id, tag=tag) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm text-muted p-0" title="Remove tag">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if not task.completed %}
+            <div class="mt-2 mb-3">
+                <form method="POST" action="{{ url_for('tasks.add_tag', task_id=task.id) }}" class="d-flex">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="input-group input-group-sm" style="max-width: 300px;">
+                        {{ tag_form.name(class="form-control", placeholder="Add a tag...") }}
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="row mb-4">
+            {% if task.due_date %}
+            <div class="col-md-6 mb-3">
+                <div class="detail-card p-3 rounded bg-light">
+                    <h6 class="detail-title text-muted mb-2">
+                        <i class="far fa-calendar-alt me-2"></i>Due Date
+                    </h6>
+                    <p class="mb-0 fw-medium">{{ task.due_date.strftime('%B %d, %Y') }}</p>
+                    
+                    {% if task.is_overdue and not task.completed %}
+                    <div class="mt-2">
+                        <span class="badge bg-danger">
+                            <i class="fas fa-exclamation-triangle me-1"></i> {{ (date.today() - task.due_date).days }} days overdue
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="col-md-6 mb-3">
+                <div class="detail-card p-3 rounded bg-light">
+                    <h6 class="detail-title text-muted mb-2">
+                        <i class="far fa-clock me-2"></i>Created At
+                    </h6>
+                    <p class="mb-0 fw-medium">{{ task.created_at.strftime('%B %d, %Y at %H:%M') }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <h5 class="mb-3">Description</h5>
+            <div class="p-3 bg-light rounded">
+                <p class="mb-0">{{ task.description or 'No description provided.' }}</p>
+            </div>
+        </div>
+        
+        {% if not task.completed %}
+        <div class="d-flex justify-content-end">
+            <form method="POST" action="{{ url_for('tasks.toggle_task', task_id=task.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check me-1"></i> Mark as Completed
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the task:</p>
+                <p class="fw-bold">"{{ task.title }}"?</p>
+                <p class="small text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('tasks.delete_task', task_id=task.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

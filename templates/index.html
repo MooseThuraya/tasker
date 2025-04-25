@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}My Tasks | {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">My Tasks</h1>
+        <p class="text-muted mb-0">Manage your tasks and stay organized</p>
+    </div>
+    <div>
+        <a href="{{ url_for('tasks.create_task') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Add Task
+        </a>
+    </div>
+</div>
+
+{% if tasks %}
+<div class="card mb-4 shadow-sm">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <div class="row align-items-center w-100">
+            <div class="col-md-5 fw-medium">Task Name</div>
+            <div class="col-md-3 fw-medium">Due Date</div>
+            <div class="col-md-2 fw-medium">Status</div>
+            <div class="col-md-2 fw-medium">Actions</div>
+        </div>
+        <div class="dropdown ms-3">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-sort me-1"></i> Sort
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                <li><a class="dropdown-item" href="?sort=title">By Name</a></li>
+                <li><a class="dropdown-item" href="?sort=due_date">By Due Date</a></li>
+                <li><a class="dropdown-item" href="?sort=status">By Status</a></li>
+                <li><a class="dropdown-item" href="?sort=priority">By Priority</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between p-3 border-bottom">
+        <div class="d-flex">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" id="taskSearch" class="form-control border-start-0" placeholder="Search tasks...">
+            </div>
+        </div>
+        <div class="d-flex">
+            <select class="form-select form-select-sm me-2" id="filterStatus">
+                <option value="all">All Status</option>
+                <option value="completed">Completed</option>
+                <option value="pending">Pending</option>
+                <option value="overdue">Overdue</option>
+            </select>
+            <select class="form-select form-select-sm" id="filterPriority">
+                <option value="all">All Priorities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="none">No Priority</option>
+            </select>
+        </div>
+    </div>
+    
+    <ul class="list-group list-group-flush" id="taskList">
+        {% for task in tasks %}
+        <li class="list-group-item 
+            {% if task.completed %}task-completed{% elif task.is_overdue %}task-overdue{% endif %} 
+            {% if task.priority == 'high' %}task-high-priority
+            {% elif task.priority == 'medium' %}task-medium-priority
+            {% elif task.priority == 'low' %}task-low-priority
+            {% else %}task-no-priority{% endif %} 
+            task-item" 
+            data-completed="{{ task.completed|lower }}" 
+            data-status="{% if task.completed %}completed{% elif task.is_overdue %}overdue{% else %}pending{% endif %}"
+            data-priority="{{ task.priority|default('none', true) }}">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 quick-complete">
+                            <form method="POST" action="{{ url_for('tasks.toggle_task', task_id=task.id) }}" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-link text-decoration-none p-0 task-toggle" data-bs-toggle="tooltip" title="{% if task.completed %}Mark as incomplete{% else %}Mark as complete{% endif %}">
+                                    <i class="fas {% if task.completed %}fa-check-circle text-success{% elif task.is_overdue %}fa-exclamation-circle text-danger{% else %}fa-circle text-secondary{% endif %} fa-lg"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <a href="{{ url_for('tasks.task_detail', task_id=task.id) }}" class="text-decoration-none">
+                            <span class="task-title">{{ task.title }}</span>
+                        </a>
+                        {% if task.tags %}
+                        <div class="ms-2">
+                            {% for tag in task.tags.split(',') %}
+                                <span class="badge bg-light text-dark">{{ tag.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    {% if task.due_date %}
+                        <div class="d-flex align-items-center">
+                            <i class="far fa-calendar-alt me-2 text-muted"></i>
+                            <span class="me-2">{{ task.due_date.strftime('%b %d, %Y') }}</span>
+                            {% if task.is_overdue %}
+                                <span class="badge bg-danger">Overdue</span>
+                            {% elif task.due_date == today or (task.due_date|string)[:10] == (today|string)[:10] %}
+                                <span class="badge bg-warning text-dark">Today</span>
+                            {% elif task.due_date == tomorrow or (task.due_date|string)[:10] == (tomorrow|string)[:10] %}
+                                <span class="badge bg-info">Tomorrow</span>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <span class="text-muted"><i class="far fa-calendar-alt me-2"></i>No due date</span>
+                    {% endif %}
+                </div>
+                <div class="col-md-2">
+                    <span class="badge {% if task.completed %}bg-success{% elif task.is_overdue %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {% if task.completed %}Completed{% else %}Pending{% endif %}
+                    </span>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        {% if not task.completed %}
+                        <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ task.id }}" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal{{ task.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Delete Task</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete the task:</p>
+                                    <p class="fw-bold">"{{ task.title }}"?</p>
+                                    <p class="small text-muted">This action cannot be undone.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <form method="POST" action="{{ url_for('tasks.delete_task', task_id=task.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% else %}
+<div class="card shadow-sm mb-4">
+    <div class="empty-state">
+        <i class="fas fa-clipboard-list empty-state-icon"></i>
+        <h3>No tasks yet</h3>
+        <p class="text-muted">Add your first task to start keeping track of what you need to do.</p>
+        <a href="{{ url_for('tasks.create_task') }}" class="btn btn-primary mt-2">
+            <i class="fas fa-plus me-1"></i> Add Your First Task
+        </a>
+    </div>
+</div>
+{% endif %}
+
+{% block extra_js %}
+<script>
+    // Enable tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Task search functionality
+        const taskSearchEl = document.getElementById('taskSearch');
+        if (taskSearchEl) {
+            taskSearchEl.addEventListener('input', function(e) {
+                filterTasks();
+            });
+        }
+        
+        // Status filter
+        const statusFilterEl = document.getElementById('filterStatus');
+        if (statusFilterEl) {
+            statusFilterEl.addEventListener('change', function(e) {
+                filterTasks();
+            });
+        }
+        
+        // Priority filter
+        const priorityFilterEl = document.getElementById('filterPriority');
+        if (priorityFilterEl) {
+            priorityFilterEl.addEventListener('change', function(e) {
+                filterTasks();
+            });
+        }
+        
+        // Combined filter function
+        function filterTasks() {
+            const searchTerm = document.getElementById('taskSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const priorityFilter = document.getElementById('filterPriority').value;
+            
+            const taskItems = document.querySelectorAll('.task-item');
+            
+            taskItems.forEach(item => {
+                const titleElement = item.querySelector('.task-title');
+                if (!titleElement) return;
+                
+                const taskTitle = titleElement.textContent.toLowerCase();
+                const status = item.dataset.status;
+                const priority = item.dataset.priority;
+                
+                const searchMatch = taskTitle.includes(searchTerm);
+                const statusMatch = statusFilter === 'all' || status === statusFilter;
+                const priorityMatch = priorityFilter === 'all' || priority === priorityFilter;
+                
+                if (searchMatch && statusMatch && priorityMatch) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
+{% endblock extra_js %}
+{% endblock content %}

@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('tasks.index') }}" class="text-decoration-none">
+        <i class="fas fa-arrow-left me-1"></i> Back to Tasks
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header py-3">
+                <h5 class="mb-0">{{ title }}</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    
+                    <div class="mb-4">
+                        {{ form.title.label(class="form-label fw-medium") }}
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-tasks text-primary"></i>
+                            </span>
+                            {{ form.title(class="form-control", placeholder="Enter task title") }}
+                        </div>
+                        {% for error in form.title.errors %}
+                            <div class="text-danger mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.description.label(class="form-label fw-medium") }}
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-align-left text-primary"></i>
+                            </span>
+                            {{ form.description(class="form-control", rows=5, placeholder="Describe your task...") }}
+                        </div>
+                        {% for error in form.description.errors %}
+                            <div class="text-danger mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            {{ form.due_date.label(class="form-label fw-medium") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="far fa-calendar-alt text-primary"></i>
+                                </span>
+                                {{ form.due_date(class="form-control", type="date") }}
+                            </div>
+                            {% for error in form.due_date.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            {{ form.due_time.label(class="form-label fw-medium") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="far fa-clock text-primary"></i>
+                                </span>
+                                {{ form.due_time(class="form-control", type="time") }}
+                            </div>
+                            {% for error in form.due_time.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            {{ form.priority.label(class="form-label fw-medium") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-flag text-primary"></i>
+                                </span>
+                                {{ form.priority(class="form-select") }}
+                            </div>
+                            {% for error in form.priority.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                            
+                            <div class="mt-2 d-flex">
+                                <div class="priority-preview me-1">
+                                    <span class="badge bg-danger d-none" id="high-badge">High</span>
+                                    <span class="badge bg-warning text-dark d-none" id="medium-badge">Medium</span>
+                                    <span class="badge bg-info d-none" id="low-badge">Low</span>
+                                    <span class="badge bg-secondary d-none" id="none-badge">None</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            {{ form.tags.label(class="form-label fw-medium") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-tags text-primary"></i>
+                                </span>
+                                {{ form.tags(class="form-control", placeholder="e.g. work, project, personal") }}
+                            </div>
+                            {% for error in form.tags.errors %}
+                                <div class="text-danger mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <small class="form-text text-muted">{{ form.tags.description }}</small>
+                        </div>
+                    </div>
+                    
+                    {% if 'Edit' in title %}
+                    <div class="mb-4">
+                        <div class="form-check">
+                            {{ form.completed(class="form-check-input") }}
+                            {{ form.completed.label(class="form-check-label fw-medium") }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-2">
+                        <a href="{{ url_for('tasks.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                        {{ form.submit(class="btn btn-primary px-4") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Priority badge preview
+    const prioritySelect = document.getElementById('priority');
+    const highBadge = document.getElementById('high-badge');
+    const mediumBadge = document.getElementById('medium-badge');
+    const lowBadge = document.getElementById('low-badge');
+    const noneBadge = document.getElementById('none-badge');
+    
+    function updatePriorityPreview() {
+        // Hide all badges
+        highBadge.classList.add('d-none');
+        mediumBadge.classList.add('d-none');
+        lowBadge.classList.add('d-none');
+        noneBadge.classList.add('d-none');
+        
+        // Show the selected one
+        if (prioritySelect.value === 'high') {
+            highBadge.classList.remove('d-none');
+        } else if (prioritySelect.value === 'medium') {
+            mediumBadge.classList.remove('d-none');
+        } else if (prioritySelect.value === 'low') {
+            lowBadge.classList.remove('d-none');
+        } else {
+            noneBadge.classList.remove('d-none');
+        }
+    }
+    
+    // Update preview on load
+    updatePriorityPreview();
+    
+    // Update preview on change
+    prioritySelect.addEventListener('change', updatePriorityPreview);
+</script>
+{% endblock %}
+{% endblock %}

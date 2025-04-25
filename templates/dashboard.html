@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | {{ super() }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Additional styles for dashboard elements */
+.icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-primary-light {
+    background-color: rgba(123, 104, 238, 0.2);
+}
+
+.bg-success-light {
+    background-color: rgba(92, 184, 92, 0.2);
+}
+
+.bg-danger-light {
+    background-color: rgba(255, 82, 82, 0.2);
+}
+
+.bg-info-light {
+    background-color: rgba(23, 162, 184, 0.2);
+}
+
+.text-info {
+    color: #17a2b8;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Dashboard</h1>
+        <p class="text-muted mb-0">Monitor your task progress and metrics</p>
+    </div>
+    <a href="{{ url_for('tasks.create_task') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> Add Task
+    </a>
+</div>
+
+<div class="row">
+    <!-- Overdue Tasks Card -->
+    <div class="col-md-3 mb-4">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="icon-circle bg-danger-light me-3">
+                        <i class="fas fa-exclamation-circle text-danger"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Overdue</h5>
+                </div>
+                <h2 class="display-5 fw-bold mb-0">{{ metrics.overdue }}</h2>
+                <p class="text-muted mt-2 mb-0">
+                    <small>Tasks past their due date</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Tasks Card -->
+    <div class="col-md-3 mb-4">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="icon-circle bg-info-light me-3">
+                        <i class="fas fa-hourglass-half text-info"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Pending</h5>
+                </div>
+                <h2 class="display-5 fw-bold mb-0">{{ metrics.pending }}</h2>
+                <p class="text-muted mt-2 mb-0">
+                    <small>Tasks waiting to be completed</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Completed Tasks Card -->
+    <div class="col-md-3 mb-4">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="icon-circle bg-success-light me-3">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Completed</h5>
+                </div>
+                <h2 class="display-5 fw-bold mb-0">{{ metrics.completed }}</h2>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                        style="width: {{ metrics.completed_percent }}%" 
+                        aria-valuenow="{{ metrics.completed_percent }}" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+                <p class="text-muted mt-2 mb-0">
+                    <small>{{ metrics.completed_percent }}% completion rate</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Tasks Card -->
+    <div class="col-md-3 mb-4">
+        <div class="card dashboard-card h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="icon-circle bg-primary-light me-3">
+                        <i class="fas fa-tasks text-primary"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Total Tasks</h5>
+                </div>
+                <h2 class="display-5 fw-bold mb-0">{{ metrics.total }}</h2>
+                <p class="text-muted mt-2 mb-0">
+                    <small>All active and completed tasks</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card dashboard-card mt-2 mb-4">
+    <div class="card-header py-3">
+        <h5 class="mb-0">Progress Overview</h5>
+    </div>
+    <div class="card-body p-4">
+        {% if metrics.total > 0 %}
+        <div class="progress mb-4" style="height: 20px; border-radius: 10px;">
+            <div class="progress-bar bg-success" role="progressbar" 
+                    style="width: {{ metrics.completed_percent }}%" 
+                    aria-valuenow="{{ metrics.completed_percent }}" aria-valuemin="0" aria-valuemax="100">
+                {{ metrics.completed_percent }}% Completed
+            </div>
+        </div>
+        
+        <div class="row justify-content-center text-center">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="fas fa-list-ul fa-2x mb-2 text-primary"></i>
+                    <h5>View Tasks</h5>
+                    <p class="text-muted mb-2">See all your pending and completed tasks</p>
+                    <a href="{{ url_for('tasks.index') }}" class="btn btn-outline-primary btn-sm">Go to Tasks</a>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="fas fa-plus-circle fa-2x mb-2 text-success"></i>
+                    <h5>Create Task</h5>
+                    <p class="text-muted mb-2">Add a new task to your list</p>
+                    <a href="{{ url_for('tasks.create_task') }}" class="btn btn-outline-success btn-sm">New Task</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-clipboard-list fa-4x mb-3 text-muted"></i>
+            <h3>No tasks yet</h3>
+            <p class="text-muted">Add your first task to start seeing stats on your dashboard</p>
+            <a href="{{ url_for('tasks.create_task') }}" class="btn btn-primary mt-2">
+                <i class="fas fa-plus me-1"></i> Add Your First Task
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh dashboard data every 60 seconds
+    setTimeout(function() {
+        location.reload();
+    }, 60000);
+</script>
+{% endblock %}
+

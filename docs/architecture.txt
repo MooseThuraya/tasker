@@ -1,0 +1,40 @@
+Architecture Diagram for Task Manager Application
+
+User
+ │
+ ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                           Flask Application                          │
+│                                                                     │
+│  ┌─────────────┐      ┌─────────────┐      ┌─────────────────────┐  │
+│  │  Tasks BP   │      │ Dashboard BP│      │ Forms & Models      │  │
+│  │             │      │             │      │                     │  │
+│  │ - List      │      │ - Metrics   │      │ - TaskForm          │  │
+│  │ - Create    │      │ - API       │      │ - User model        │  │
+│  │ - Edit      │      │             │      │ - Task model        │  │
+│  │ - Delete    │      │             │      │                     │  │
+│  └──────┬──────┘      └──────┬──────┘      └──────────┬─────────┘  │
+│         │                    │                        │             │
+│         └────────┬───────────┴────────────┬──────────┘             │
+│                  │                        │                         │
+│         ┌────────▼────────┐      ┌────────▼─────────┐              │
+│         │                 │      │                  │              │
+│         │  Templates      │      │  Database (ORM)  │              │
+│         │  (Jinja2)       │      │  (SQLAlchemy)    │              │
+│         │                 │      │                  │              │
+│         └─────────────────┘      └────────┬─────────┘              │
+│                                           │                         │
+└───────────────────────────────────────────┼─────────────────────────┘
+                                            │
+                                            ▼
+                                  ┌─────────────────────┐
+                                  │   Database Engine   │
+                                  │   (SQLite/MSSQL)    │
+                                  └─────────────────────┘
+
+Notes:
+- This is a Flask application with a clear separation of concerns
+- The app uses blueprints to organize routes by functionality
+- SQLAlchemy ORM provides database abstraction
+- Dashboard uses pandas for data aggregation
+- The app is containerized with Docker for easy deployment

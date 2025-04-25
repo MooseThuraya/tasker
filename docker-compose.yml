@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5001:5000"
+    environment:
+      - DATABASE_URL=sqlite:///tasks.db
+      - SECRET_KEY=dev-secret-key-change-in-production
+    volumes:
+      - ./:/app
+    command: >  
+      sh -c "gunicorn --workers=2 --bind=0.0.0.0:5000 'app:app'"
+    restart: unless-stopped
